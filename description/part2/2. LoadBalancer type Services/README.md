@@ -19,20 +19,20 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: aws-krug-clb
-  name: aws-kurg-clb
+    app: wonder-mz-clb
+  name: wonder-mz-clb
 spec:
   ports:
     - port: 80
       protocol: TCP
   selector:
-    app: aws-krug
+    app: wonder-mz
   sessionAffinity: None
   type: LoadBalancer
 ```
 ```
 $ k apply -f clb-service.yaml
-service/aws-kurg-clb created
+service/wonder-mz-clb created
 ```
 
 <Br>
@@ -43,7 +43,7 @@ Subnet 의 Tag 가 EKS Cluster 이름과 같은지, elb 할당 관련 Tag가 있
 ```
 $ k get svc
 NAME       TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
-aws-krug-clb   LoadBalancer   10.100.197.169   <pending>     80:31397/TCP   5m1s
+wonder-mz-clb   LoadBalancer   10.100.197.169   <pending>     80:31397/TCP   5m1s
 
 
 $ k describe svc
@@ -53,7 +53,7 @@ Events:
   Type     Reason                      Age                From                Message
   ----     ------                      ----               ----                -------
   Normal   EnsuringLoadBalancer        28s (x4 over 64s)  service-controller  Ensuring load balancer
-  Warning  CreatingLoadBalancerFailed  28s (x4 over 64s)  service-controller  Error creating load balancer (will retry): failed to ensure load balancer for service krug/aws-kurg-clb: could not find any suitable subnets for creating the ELB
+  Warning  CreatingLoadBalancerFailed  28s (x4 over 64s)  service-controller  Error creating load balancer (will retry): failed to ensure load balancer for service krwonder-mz-clb: could not find any suitable subnets for creating the ELB
 ```
 
 #### CLB가 재생성되지 않은 상태로 Event도 받지 않을 때
@@ -70,8 +70,18 @@ AWS EKS Bug로 판단되는데, 간혹 Worker Node의 Security Group의 Inbound�
 <br>
 
 해결:
-* 수동으로 CLB가 생성했던 Security Group을 삭제하는 과정으로 해결 가능
+* 기다림...9분 47초 만에 잘 생성됨. -> Security Group 을 아예 새로 만들었음.
+```
+root@ip-172-16-0-242:~# k get svc --watch
+NAME            TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes      ClusterIP      10.100.0.1      <none>        443/TCP        145m
+wonder-mz-clb   LoadBalancer   10.100.193.97   <pending>     80:32118/TCP   13s
 
+wonder-mz-clb   LoadBalancer   10.100.193.97   afaf70981f95d...   80:32118/TCP   9m47s
+``` 
+* 수동으로 CLB가 생성했던 Security Group을 삭제하는 과정으로 해결 가능
+<br>
+<br>
 
 ### 2-2. CLB Service 여러개 만들어보기
 이름을 변경하여 Service를 하나 더 생성해봅니다. 
@@ -80,8 +90,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: aws-krug-clb2
-  name: aws-kurg-clb2
+    app: wonder-mz-clb2
+  name: wonder-mz-clb2
 spec:
   ports:
     - port: 80
@@ -93,12 +103,12 @@ spec:
 ```
 ```
 $ k apply -f clb-service2.yaml
-service/aws-kurg-clb2 created
+service/wonder-mz-clb2 created
 
 $ k get svc
 NAME            TYPE           CLUSTER-IP      EXTERNAL-IP                                                                    PORT(S)        AGE
-aws-kurg-clb    LoadBalancer   10.100.237.96   a8dcb47b5f15711e9ba130241978a6fc-1711756101.ap-northeast-2.elb.amazonaws.com   80:30605/TCP   3s
-aws-kurg-clb2   LoadBalancer   10.100.26.131   a53480295f15711e9b46b0a642f7dec9-1189571686.ap-northeast-2.elb.amazonaws.com   80:31667/TCP   101s
+wonder-mz-clb    LoadBalancer   10.100.237.96   a8dcb47b5f15711e9ba130241978a6fc-1711756101.ap-northeast-2.elb.amazonaws.com   80:30605/TCP   3s
+wonder-mz-clb2   LoadBalancer   10.100.26.131   a53480295f15711e9b46b0a642f7dec9-1189571686.ap-northeast-2.elb.amazonaws.com   80:31667/TCP   101s
 ```
 
 ELB 메뉴에서 CLB 생성을 확인해봅니다.
@@ -126,8 +136,8 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
   labels:
-    app: aws-krug-nlb
-  name: aws-kurg-nlb
+    app: wonder-mz-nlb
+  name: wonder-mz-nlb
 spec:
   ports:
     - port: 80
@@ -139,7 +149,7 @@ spec:
 ```
 ```
 $ k apply -f nlb-service.yaml
-service/aws-kurg-nlb created
+service/wonder-mz-nlb created
 ```
 
 ### 2-4. Servicer Type Resource를 Internal ELB (CLB, NLB) 를 사용하기
@@ -150,8 +160,8 @@ metadata:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
   labels:
-    app: aws-krug-internal-clb
-  name: aws-kurg-internal-clb
+    app: wonder-mz-internal-clb
+  name: wonder-mz-internal-clb
 spec:
   ports:
     - port: 80
@@ -163,7 +173,7 @@ spec:
 ```
 ```
 $ k apply -f internal-service.yaml
-service/aws-kurg-internal-clb created
+service/wonder-mz-internal-clb created
 ```
 
 **관련 문서**

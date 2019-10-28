@@ -311,7 +311,7 @@ resource "aws_instance" "kubectl" {
   associate_public_ip_address = true
   ami = var.kubectl_image_id
   subnet_id = var.vpc_public_subnet_ids[0]
-  instance_type = "t3.micro"
+  instance_type = "t3.medium"
   key_name = var.kubectl_ec2_keypair
   vpc_security_group_ids = [
     aws_security_group.kubectl_sg.id
@@ -382,3 +382,35 @@ https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#AvailableIpPe
 <br>
 https://github.com/awslabs/amazon-eks-ami/blob/master/files/eni-max-pods.txt
 
+### 3-11. EKS Cluster 업데이트 하기
+EKS Master 는 관리형 서비스로 중단없이 seamless 하게 업데이트가 가능합니다.<br>
+다만, EKS Master 만 업데이트를 지원할 뿐, Worker Nodes, kubectl cli, iam-authenticator 등은 직접 업데이트 해야합니다.<br>
+특히 상용 서비스의 경우, 무중단 업데이트를 하는 것은 고려할 사항이 상당히 많을 수 있습니다. <br>
+업데이트 시도 전 아래 내용들을 확인하고 장애를 겪지 않도록 꼼꼼히 체크해야 합니다. <br>
+상용 환경과 최대한 동일한 환경에서 사전에 진행 후 점검하기를 강력히 권장합니다.
+
+#### EKS Update 주기 체크하기
+EKS Cluster 업데이트는 생각보다 빠르게 진행되고 있습니다. <br>
+1.11 버전의 경우 2019-11-04 까지만 지원하며, 이 후 강제로 1.12 로 업데이트 됩니다.<br>
+따라서 사전에 Master Update Plan 을 검토해야 합니다.
+
+#### Worker Node AMI 업데이트 하기
+신규 버전의 Cluster에 신규 AMI에서도 잘 동작하는지 보기 위해 Blue/Green/Canary 전략을 도입 해 볼 수 있습니다.
+* 추가 Autoscaling Group 에 신규 AMI기반으로 스케줄링
+* 정상 동작 시, Rolling Update 방식으로 Worker Node 변경 (Rollback 도 준비해야 함)
+* Cluster Update
+
+#### KubeProxy 업데이트 하기
+Side-car 목적으로 application과 kube-proxy 가 동작하는게 있다면 Cluster 업데이트에 대응할 수 있는지 같이 확인해야 합니다. <br>
+Worker-node 의 kube-proxy는 AMI 기반 업데이트 시 같이 변경되지만, application 과 같이 동작하는 kube-proxy가 따로 존재한다면 Cluster 업데이트와 함께 image 변경도 고려해야 합니다.
+
+#### kubectl, iam-authenticator 업데이트 체크
+Kubectl 명령어 도구를 사용하는 local 환경 혹은 공용 환경에서의 version도 같이 체크해야 합니다.<br>
+
+
+관련 문서
+<br>
+* [update-cluster](https://docs.aws.amazon.com/en_pv/eks/latest/userguide/update-cluster.html)
+* [update-existing-worker-node](https://docs.aws.amazon.com/en_pv/eks/latest/userguide/update-stack.html)
+* [vpc-cni-upgrade](https://docs.aws.amazon.com/en_pv/eks/latest/userguide/cni-upgrades.html)
+<br>

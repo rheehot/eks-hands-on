@@ -133,6 +133,25 @@ Dynamic Volume Provisioning 생성된 PV의 경우, 생성될 때 연결된 PVC�
 `Retain`<br>
 이 옵션으로 생성된 PV의 경우, PVC가 사라져도 PV는 유지되며, EBS도 마찬가지로 유지됩니다.
 
+아래 내용으로 gp2-sc-retail.yaml 을 생성하여 Storage class를 추가해봅니다.
+```
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gp2-retain
+provisioner: kubernetes.io/aws-ebs
+reclaimPolicy: Retain
+parameters:
+  type: gp2
+  fsType: ext4
+```
+```
+$ k apply -f gp2-sc-retail.yaml
+
+$ k apply -f mongo-pvc.yaml
+
+$ k apply -f mongo.yaml
+```
 ```
 $ k get pv
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM              STORAGECLASS   REASON   AGE

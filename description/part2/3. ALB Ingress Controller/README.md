@@ -51,7 +51,6 @@ ALB Ingress Controller Plugin은 아래 설치 방법들을 제공합니다.
 
 
 ### 3-4. Ingress 만들기
-
 아래와 같이 `alb-ingress.yaml`을 생성합니다.
 
 ```
@@ -59,23 +58,23 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    alb.ingress.kubernetes.io/healthcheck-path: /check
+    alb.ingress.kubernetes.io/healthcheck-path: /
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: instance
     kubernetes.io/ingress.class: alb
   labels:
-    app.kubernetes.io/name: aws-krug-alb-ingress
-  name: awskrug-ingress
+    app.kubernetes.io/name: wonder-mz-alb-ingress
+  name: wonder-mz-ingress
 spec:
   rules:
-    - host: console.awskrug.com
+    - host: console.wondermz.com
       http:
         paths:
           - backend:
               serviceName: console
               servicePort: 80
             path: /*
-    - host: api.awskurg.com
+    - host: api.wondermz.com
       http:
         paths:
           - backend:
@@ -102,6 +101,6 @@ Worker의 Security Group 규칙에 Worker Node 사이에 UDP 53 포트가 허용
 
 Error Log - timeout
 ```
-E1018 06:02:05.933771       1 :0] kubebuilder/controller "msg"="Reconciler error" "error"="failed to build LoadBalancer configuration due to failed to get AWS tags. Error: RequestError: send request failed\ncaused by: Post https://tagging.ap-northeast-2.amazonaws.com/: dial tcp: i/o timeout"  "controller"="alb-ingress-controller" "request"={"Namespace":"default","Name":"awskrug-ingress"}
+E1018 06:02:05.933771       1 :0] kubebuilder/controller "msg"="Reconciler error" "error"="failed to build LoadBalancer configuration due to failed to get AWS tags. Error: RequestError: send request failed\ncaused by: Post https://tagging.ap-northeast-2.amazonaws.com/: dial tcp: i/o timeout"  "controller"="alb-ingress-controller" "request"={"Namespace":"default","Name":"wonder-mz-ingress"}
 ```
 

@@ -36,8 +36,8 @@ metadata:
     alb.ingress.kubernetes.io/target-type: instance
     kubernetes.io/ingress.class: alb
   labels:
-    app.kubernetes.io/name: aws-krug-alb-ingress
-  name: awskrug-ingress
+    app.kubernetes.io/name: wonder-mz-alb-ingress
+  name: wonder-mz-ingress
 spec:
   rules:
     - host: console.wondermz.com
