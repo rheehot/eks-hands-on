@@ -17,7 +17,7 @@ resource "aws_subnet" "vpc_public_subnets" {
   availability_zone = lookup(var.vpc_public_subnets[count.index], "az")
 
   tags = {
-    Name = "${var.vpc_name}-${lookup(var.vpc_public_subnets[count.index], "name")}"
+    Name = "${var.vpc_name}_${lookup(var.vpc_public_subnets[count.index], "name")}"
     Managed_by = "terraform"
     "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"
     "kubernetes.io/role/elb" = "1"
@@ -31,7 +31,7 @@ resource "aws_subnet" "vpc_private_subnets" {
   availability_zone = lookup(var.vpc_private_subnets[count.index], "az")
 
   tags = {
-    Name = "${var.vpc_name}-${lookup(var.vpc_private_subnets[count.index], "name")}"
+    Name = "${var.vpc_name}_${lookup(var.vpc_private_subnets[count.index], "name")}"
     Managed_by = "terraform"
     "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb" = "1"

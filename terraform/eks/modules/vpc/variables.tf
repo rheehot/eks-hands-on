@@ -11,17 +11,17 @@ variable "vpc_public_subnets" {
     {
       az = "ap-northeast-2a",
       cidr = "172.16.0.0/23",
-      name = "public-subnet-a"
+      name = "public_subnet_a"
     },
     {
       az = "ap-northeast-2b",
       cidr = "172.16.2.0/23",
-      name = "public-subnet-b"
+      name = "public_subnet_b"
     },
     {
       az = "ap-northeast-2c",
       cidr = "172.16.4.0/23",
-      name = "public-subnet-c"
+      name = "public_subnet_c"
     }
   ]
   type = "list"
@@ -32,17 +32,17 @@ variable "vpc_private_subnets" {
     {
       az = "ap-northeast-2a",
       cidr = "172.16.10.0/23",
-      name = "private-subnet-a"
+      name = "private_subnet_a"
     },
     {
       az = "ap-northeast-2b",
       cidr = "172.16.12.0/23",
-      name = "private-subnet-b"
+      name = "private_subnet_b"
     },
     {
       az = "ap-northeast-2c",
       cidr = "172.16.14.0/23",
-      name = "private-subnet-c"
+      name = "private_subnet_c"
     }
   ]
   type = "list"
