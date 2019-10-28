@@ -34,7 +34,7 @@ AWS EC2 Console 로 이동하여 default VPC 에 Hands-on 용 EC2 하나를 생�
 | --------        | ----------                                        |
 | OS              | Amazon Linux 2                                    |
 | Instance Type   | t2.micro                                          |
-| Network         | Default VPC<br>Public IP Assigned                 |
+| Network         | VPC: Default VPC<br> IP: Public IP Assigned       |
 | IAM Role        | 이름: `wonder-mz-admin` <br>권한: Administrator Role|
 | Storage         | Root Volume 8gb (gp2)                             |
 | Security Group  | Inbound Port: 22(ssh) <br>Source: My IP           |
@@ -102,7 +102,7 @@ EKS 구성 hands-on으로 넘어가기 전, 아래 내용과 같이 준비되었
 * pem 키는 `wonder-mz-key` 로 만들었는가?
 * Workshop EC2에 pem 키를 ssh daemon에 추가했는가?
   * Workshop 진행용 EC2에서 아래 확인 
-  * 추가: `$ ssh-add wonder-mz.key.pem`
+  * 추가: `$ ssh-add wonder-mz-key.pem`
   * 확인: `$ ssh-add -L`
 
 

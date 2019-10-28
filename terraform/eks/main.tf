@@ -32,7 +32,6 @@ module "eks" {
   kubectl_ec2_keypair = var.kubectl_ec2_keypair
   eks_version = var.eks_version
   ec2_kubectl_role = var.ec2_admin_role
-
 }
 
 module "ansible" {
