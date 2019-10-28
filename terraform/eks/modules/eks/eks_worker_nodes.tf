@@ -134,7 +134,7 @@ resource "aws_autoscaling_group" "eks_worker_nodes_asg" {
   desired_capacity = lookup(var.eks_worker_nodes_asg_group, "desire")
   min_size = lookup(var.eks_worker_nodes_asg_group, "min")
   max_size = lookup(var.eks_worker_nodes_asg_group, "max")
-  name = "${aws_eks_cluster.eks_cluster.name}-worker"
+  name = "${aws_eks_cluster.eks_cluster.name}_worker"
   vpc_zone_identifier = [
     var.vpc_private_subnet_ids[0],
     var.vpc_private_subnet_ids[1],

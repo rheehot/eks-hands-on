@@ -35,11 +35,11 @@ AWS EC2 Console 로 이동하여 default VPC 에 Hands-on 용 EC2 하나를 생�
 | OS              | Amazon Linux 2                                    |
 | Instance Type   | t2.micro                                          |
 | Network         | VPC: Default VPC<br> IP: Public IP Assigned       |
-| IAM Role        | 이름: `wonder-mz-admin` <br>권한: Administrator Role|
+| IAM Role        | 이름: `wonder_mz_admin` <br>권한: Administrator Role|
 | Storage         | Root Volume 8gb (gp2)                             |
 | Security Group  | Inbound Port: 22(ssh) <br>Source: My IP           |
-| Tag             | Name: `wonder-mz-workshop`                        |
-| PEM key         | 이름: `wonder-mz-key`                              |
+| Tag             | Name: `wonder_mz_workshop`                        |
+| PEM key         | 이름: `wonder_mz_key`                              |
 
 ### 1-2. EC2 접속하기 (1 min)
 #### Mac / Linux 
@@ -47,10 +47,10 @@ EC2에 접속하기.
 ```bash
 ## EC2 접속 전 Mac / Linux PC 에서 할 일.
 ## pem 키 읽기 권한으로 변경
-$ chmod 400 wonder-mz-key.pem
+$ chmod 400 wonder_mz_key.pem
 
 ## pem 키를 ssh pem list 에 추가 (접속 편하게 하려고 추가)
-$ ssh-add wonder-mz-key.pem
+$ ssh-add wonder_mz_key.pem
 
 ## 접속하기. -A 옵션은 pem키를 해당 ec2까지 포워딩해서 넣는것
 $ ssh -A ec2-user@<your-ec2-ip>
@@ -63,13 +63,13 @@ AWS 가이드 문서: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.
 **PEM 키 복사 및 추가 설정**
 Putty를 통해 EC2 접속 이 후, pem 키를 ec2 내부로 복사함 (추후 Ansible에서 사용 예정)
 1. Download 받은 pem 키 (ppk로 변경 전 파일) 내용을 복사.
-2. EC2 내부에서 wonder-mz-key.pem 파일로 내용 동일하게 생성.
+2. EC2 내부에서 wonder_mz_key.pem 파일로 내용 동일하게 생성.
 ```
 ## pem 키 읽기 권한으로 변경
-$ chmod 400 wonder-mz-key.pem
+$ chmod 400 wonder_mz_key.pem
 
 ## pem 키를 ssh pem list 에 추가 (접속 편하게 하려고 추가)
-$ ssh-add wonder-mz-key.pem 
+$ ssh-add wonder_mz_key.pem 
 ```
 
 ### 1-3 소스코드 준비하기 (1 mins)
@@ -98,11 +98,11 @@ $ ansible --version
 여기까지 EKS 설치 전, 동일한 환경에서 진행하기 위해 EC2에 Terraform과 Ansible 을 설치하고 Source Code를 받았습니다.<br>
 EKS 구성 hands-on으로 넘어가기 전, 아래 내용과 같이 준비되었는지 체크해 봅니다.
 * Default VPC 에 Workshop EC2를 만들었는가?
-* IAM Role `wonder-mz-admin` 을 만들고, Workshop EC2에 할당했는가?
-* pem 키는 `wonder-mz-key` 로 만들었는가?
+* IAM Role `wonder_mz_admin` 을 만들고, Workshop EC2에 할당했는가?
+* pem 키는 `wonder_mz_key` 로 만들었는가?
 * Workshop EC2에 pem 키를 ssh daemon에 추가했는가?
   * Workshop 진행용 EC2에서 아래 확인 
-  * 추가: `$ ssh-add wonder-mz-key.pem`
+  * 추가: `$ ssh-add wonder_mz_key.pem`
   * 확인: `$ ssh-add -L`
 
 
@@ -129,7 +129,9 @@ $ vim local.tfvars
 
 **파일 내용**<br>
 ``` 
-ec2_amdin_role = "wonder-mz-admin"
+ec2_amdin_role = "wonder_mz_admin"
+
+kubectl_ec2_keypair = "wonder_mz_key"
 ```
 
 ### 2-3. Terraform Plan 보기 (1 min)
@@ -255,7 +257,7 @@ resource "aws_autoscaling_group" "eks_worker_nodes_asg" {
   desired_capacity = lookup(var.eks_worker_nodes_asg_group, "desire")
   min_size = lookup(var.eks_worker_nodes_asg_group, "min")
   max_size = lookup(var.eks_worker_nodes_asg_group, "max")
-  name = "${aws_eks_cluster.eks_cluster.name}-worker"
+  name = "${aws_eks_cluster.eks_cluster.name}_worker"
   vpc_zone_identifier = [
     var.vpc_private_subnet_ids[0],
     var.vpc_private_subnet_ids[1],
@@ -264,7 +266,7 @@ resource "aws_autoscaling_group" "eks_worker_nodes_asg" {
 
   tag {
     key = "Name"
-    value = "${aws_eks_cluster.eks_cluster.name}-worker"
+    value = "${aws_eks_cluster.eks_cluster.name}_worker"
     propagate_at_launch = true
   }
 
@@ -297,10 +299,10 @@ AWS VPC CNI Plugin 은 EKS의 Pod가 VPC ENI로부터 secondary IP를 할당받�
 EKS의 권한 관리는 AWS IAM Authenticator for AWS를 통해 IAM과 연결됩니다. <br>
 EKS를 최초 생성할 땐, 생성할 당신의 IAM User 혹은 IAM Role 만이 EKS Cluster 에 인증 및 권한 취득이 가능합니다. 
 
-이번 Workshop 에서는 Terraform 을 통해서 EKS 를 생성하였고, Terraform 을 수행한 서버는 IAM Role (wonder-mz-admin) 을 사용하였습니다. <br>
-RBAC에 다른 IAM User 나 Role을 추가하기 전 까지는 wonder-mz-admin Role 만이 EKS Master에 명령 수행이 가능합니다.
+이번 Workshop 에서는 Terraform 을 통해서 EKS 를 생성하였고, Terraform 을 수행한 서버는 IAM Role (wonder_mz_admin) 을 사용하였습니다. <br>
+RBAC에 다른 IAM User 나 Role을 추가하기 전 까지는 wonder_mz_admin Role 만이 EKS Master에 명령 수행이 가능합니다.
 
-이 Workshop에서는 Kubectl 명령을 수행할 서버에 wonder-mz-admin Role 을 할당하여 진행합니다.
+이 Workshop에서는 Kubectl 명령을 수행할 서버에 wonder_mz_admin Role 을 할당하여 진행합니다.
 
 **Terraform 코드**<br>
 kubectl 명령을 수행할 EC2에 iam_instance_profile 을 EKS 생성한 서버와 같은것을 할당 함.
@@ -318,7 +320,7 @@ resource "aws_instance" "kubectl" {
   ebs_optimized = true
 
   tags = {
-    Name = "${var.project_name}-kubectl"
+    Name = "${var.project_name}_kubectl"
     Managed_by = "terraform"
     Instance = "kubectl"
   }
