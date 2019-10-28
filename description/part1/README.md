@@ -87,7 +87,7 @@ $ git clone https://github.com/wondermz/eks-hands-on.git
 ```
 ### 설치
 $ cd eks-hands-on/script
-$ ./hands-on-installer.sh
+$ ./installer.sh
 
 ### 설치 확인
 $ tf version
@@ -123,7 +123,6 @@ $ tf init
 
 `~/eks-hands-on/terraform/eks/local.tfvars` 경로의 내용을 이전에 생성한 Role Name 으로 변경합니다. <br>
 ```
-$ cd ~/eks-hands-on/terraform/eks
 $ vim local.tfvars
 ```
 

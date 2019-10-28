@@ -44,7 +44,7 @@ resource "aws_internet_gateway" "vpc_igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "${var.vpc_name}-igw"
+    Name = "${var.vpc_name}_igw"
     Managed_by = "terraform"
   }
 }
@@ -54,7 +54,7 @@ resource "aws_eip" "eip_ngw" {
   vpc = true
 
   tags = {
-    Name = "${var.vpc_name}-nat-eip"
+    Name = "${var.vpc_name}_nat_eip"
     Managed_by = "terraform"
   }
 }
@@ -64,7 +64,7 @@ resource "aws_nat_gateway" "vpc_ngw" {
   subnet_id = aws_subnet.vpc_public_subnets.*.id[0]
 
   tags = {
-    Name = "${var.vpc_name}-nat-gateway"
+    Name = "${var.vpc_name}_nat_gateway"
     Managed_by = "terraform"
   }
 }
@@ -79,7 +79,7 @@ resource "aws_route_table" "vpc_public_rt" {
   }
 
   tags = {
-    Name = "${var.vpc_name}-public-rt"
+    Name = "${var.vpc_name}_public_rt"
     Managed_by = "terraform"
   }
 }
@@ -93,7 +93,7 @@ resource "aws_route_table" "vpc_private_rt" {
   }
 
   tags = {
-    Name = "${var.vpc_name}-private-rt"
+    Name = "${var.vpc_name}_private_rt"
     Managed_by = "terraform"
   }
 }
