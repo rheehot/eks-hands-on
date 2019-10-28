@@ -1,5 +1,5 @@
 resource "aws_iam_role" "eks_cluster_role" {
-  name = "${var.project_name}-eks-cluster"
+  name = "${var.project_name}_eks_cluster"
   assume_role_policy = file("${path.module}/templates/eks_cluster_assume_role_policy.json")
 }
 
@@ -14,7 +14,7 @@ resource "aws_iam_role_policy_attachment" "eks_role_AmazonEKSServicePolicy" {
 }
 
 resource "aws_security_group" "eks_cluster_sg" {
-  name = "${var.project_name}-eks-control-plane-sg"
+  name = "${var.project_name}_eks_control_plane_sg"
   vpc_id = var.vpc_id
 
   # Outbound ALL
@@ -28,7 +28,7 @@ resource "aws_security_group" "eks_cluster_sg" {
   }
 
   tags = {
-    Name = "${var.project_name}-eks-control-plane-sg",
+    Name = "${var.project_name}_eks_control_plane_sg",
     Managed_by = "terraform"
   }
 }

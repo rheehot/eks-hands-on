@@ -55,7 +55,7 @@ variable "eks_worker_nodes_enable_monitoring" {
 variable "eks_worker_nodes_asg_group" {
   default = {
     min = 2
-    max = 2
-    desire = 2
+    max = 3
+    desire = 3
   }
 }

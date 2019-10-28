@@ -1,5 +1,5 @@
 resource "aws_security_group" "eks_worker_nodes_sg" {
-  name = "${var.project_name}-eks-worker-nodes-sg"
+  name = "${var.project_name}_eks_worker_nodes_sg"
   vpc_id = var.vpc_id
 
   # Outbound ALL
@@ -13,7 +13,7 @@ resource "aws_security_group" "eks_worker_nodes_sg" {
   }
 
   tags = {
-    Name = "${var.project_name}-eks-worker-nodes-sg",
+    Name = "${var.project_name}_eks_worker_nodes_sg",
     Managed_by = "terraform"
   }
 }
@@ -143,7 +143,7 @@ resource "aws_autoscaling_group" "eks_worker_nodes_asg" {
 
   tag {
     key = "Name"
-    value = "${aws_eks_cluster.eks_cluster.name}-worker"
+    value = "${aws_eks_cluster.eks_cluster.name}_worker"
     propagate_at_launch = true
   }
 

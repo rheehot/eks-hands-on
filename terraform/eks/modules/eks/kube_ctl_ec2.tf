@@ -14,7 +14,7 @@
 //}
 
 resource "aws_security_group" "kubectl_sg" {
-  name = "${var.project_name}-kubectl-sg"
+  name = "${var.project_name}_kubectl_sg"
   vpc_id = var.vpc_id
 
   egress {
@@ -26,7 +26,7 @@ resource "aws_security_group" "kubectl_sg" {
   }
 
   tags = {
-    Name = "${var.project_name}-kubectl-sg",
+    Name = "${var.project_name}_kubectl_sg",
     Managed_by = "terraform"
   }
 }
@@ -56,7 +56,7 @@ resource "aws_instance" "kubectl" {
   ebs_optimized = true
 
   tags = {
-    Name = "${var.project_name}-kubectl"
+    Name = "${var.project_name}_kubectl"
     Managed_by = "terraform"
     Instance = "kubectl"
   }
