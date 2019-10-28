@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "kubectl_sg_ingress_ssh" {
 }
 
 resource "aws_instance" "kubectl" {
-  iam_instance_profile = var.aws_krug_admin_role
+  iam_instance_profile = var.ec2_kubectl_role
   associate_public_ip_address = true
   ami = var.kubectl_image_id
   subnet_id = var.vpc_public_subnet_ids[0]

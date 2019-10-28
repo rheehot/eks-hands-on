@@ -7,6 +7,6 @@ variable "eks_version" {
 }
 
 // Values from external variable files or command line parameter.
-variable "aws_krug_admin_role" {
+variable "ec2_kubectl_role" {
   description = "Enter your hands-on EC2's role name."
 }

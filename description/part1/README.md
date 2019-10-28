@@ -26,26 +26,31 @@ Kubernetes 가 화두가 된지는 이미 조금 되었지만, AWS의 EKS를 주
 
 이 과정만큼은 수동으로 수행합니다.
 
-### 1-1. EC2 생성하기
+### 1-1. EC2 생성하기 (5 mins)
 AWS EC2 Console 로 이동하여 default VPC 에 Hands-on 용 EC2 하나를 생성합니다.<br>
 생성한 EC2는 아래 조건을 만족하도록 합니다.
-* AMI - OS Amazon Linux 2 AMI 
-* Instance type - t2.micro
-* Public IP assigned (외부에서 접속 가능해야 함)
-* Administrator 권한의 IAM Role 할당 (필요시 신규 생성, Role 이름 : aws-krug-admin)
-* pem key 생성 (key 이름 : aws-krug-gudi)
-* 이외 설정은 기본을 따라가도록 합니다.
 
+| Resource        | Conditions                                        |
+| --------        | ----------                                        |
+| OS              | Amazon Linux 2                                    |
+| Instance Type   | t2.micro                                          |
+| Network         | Default VPC<br>Public IP Assigned                 |
+| IAM Role        | 이름: `wonder-mz-admin` <br>권한: Administrator Role|
+| Storage         | Root Volume 8gb (gp2)                             |
+| Security Group  | Inbound Port: 22(ssh) <br>Source: My IP           |
+| Tag             | Name: `wonder-mz-workshop`                        |
+| PEM key         | 이름: `wonder-mz-key`                              |
 
-### 1-2. EC2 접속하기
+### 1-2. EC2 접속하기 (1 min)
 #### Mac / Linux 
-EC2 접속 전 Mac / Linux PC 에서 할 일.
+EC2에 접속하기.
 ```bash
+## EC2 접속 전 Mac / Linux PC 에서 할 일.
 ## pem 키 읽기 권한으로 변경
-$ chmod 400 aws-krug-gudi.pem
+$ chmod 400 wonder-mz-key.pem
 
 ## pem 키를 ssh pem list 에 추가 (접속 편하게 하려고 추가)
-$ ssh-add aws-krug-gudi.pem 
+$ ssh-add wonder-mz-key.pem
 
 ## 접속하기. -A 옵션은 pem키를 해당 ec2까지 포워딩해서 넣는것
 $ ssh -A ec2-user@<your-ec2-ip>
@@ -53,70 +58,59 @@ $ ssh -A ec2-user@<your-ec2-ip>
 
 #### Windows
 Putty로 접속 필요. 
+AWS 가이드 문서: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
 
-가이드 문서: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html
-
-**EC2 접속 후**
-
-Putty를 통해 EC2 접속 이 후, pem 키를 복사함 (추후 Ansible에서 사용 예정)
+**PEM 키 복사 및 추가 설정**
+Putty를 통해 EC2 접속 이 후, pem 키를 ec2 내부로 복사함 (추후 Ansible에서 사용 예정)
+1. Download 받은 pem 키 (ppk로 변경 전 파일) 내용을 복사.
+2. EC2 내부에서 wonder-mz-key.pem 파일로 내용 동일하게 생성.
 ```
-## vim 등을 통해 EC2 생성 시 사용한 aws-krug-gudi.pem 키를 복사해서 만듬.
-$ vim aws-krug-gudi.pem
-
 ## pem 키 읽기 권한으로 변경
-$ chmod 400 aws-krug-gudi.pem
+$ chmod 400 wonder-mz-key.pem
 
 ## pem 키를 ssh pem list 에 추가 (접속 편하게 하려고 추가)
-$ ssh-add aws-krug-gudi.pem 
+$ ssh-add wonder-mz-key.pem 
 ```
 
-### 1-3 Terraform, Ansible, Git 설치하기
-#### Terraform 설치하기
-```
-$ curl https://releases.hashicorp.com/terraform/0.12.8/terraform_0.12.8_linux_amd64.zip -o terraform.zip
-
-$ unzip terraform.zip
-
-$ sudo mv terraform /usr/local/bin/terraform
-
-$ sudo ln -s /usr/local/bin/terraform /usr/local/bin/tf
-
-$ rm terraform.zip
-
-$ tf version
-```
-
-#### Ansible 설치하기
-```
-$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-
-$ sudo python get-pip.py
-
-$ sudo pip install ansible
-
-$ rm get-pip.py
-
-$ ansible --version
-```
-
+### 1-3 소스코드 준비하기 (1 mins)
 #### git, vim, telnet, tmux 설치하기
 ```
 $ sudo yum install git vim telnet tmux -y
 ```
 
-### 1-4 Source Code 받기
+#### Source Code 받기
 ```
-$ git clone https://github.com/stevenshim/eks-hands-on.git
+$ git clone https://github.com/wondermz/eks-hands-on.git
 ```
 
-### 1-5 준비단계 마무리 
-여기까지 EKS 설치 전, 동일한 환경에서 진행하기 위해 EC2에 Terraform과 Ansible 을 설치하고 Source Code를 받았습니다.
+### 1-4 Terraform, Ansible, Git 설치하기 (1 min)
+```
+### 설치
+$ cd eks-hands-on/script
+$ ./hands-on-installer.sh
+
+### 설치 확인
+$ tf version
+$ ansible --version
+```
+
+### 1-5 준비단계 마무리 (1 min)
+여기까지 EKS 설치 전, 동일한 환경에서 진행하기 위해 EC2에 Terraform과 Ansible 을 설치하고 Source Code를 받았습니다.<br>
+EKS 구성 hands-on으로 넘어가기 전, 아래 내용과 같이 준비되었는지 체크해 봅니다.
+* Default VPC 에 Workshop EC2를 만들었는가?
+* IAM Role `wonder-mz-admin` 을 만들고, Workshop EC2에 할당했는가?
+* pem 키는 `wonder-mz-key` 로 만들었는가?
+* Workshop EC2에 pem 키를 ssh daemon에 추가했는가?
+  * Workshop 진행용 EC2에서 아래 확인 
+  * 추가: `$ ssh-add wonder-mz.key.pem`
+  * 확인: `$ ssh-add -L`
 
 
 ## 2. Terraform 으로 EKS 구성하기
-
-### 2-1. Terraform Initialize 하기
+### 2-1. Terraform Initialize 하기 (2 mins)
 ```
+$ cd ~
+
 $ tmux
 
 $ cd eks-hands-on/terraform/eks
@@ -125,17 +119,20 @@ $ cd eks-hands-on/terraform/eks
 $ tf init
 ```
 
-### 2-2. Terraform 로컬 변수 파일 만들기
-Vim 을 이용해 아래와 같은 내용의 파일을 만듭니다.
+### 2-2. Terraform 로컬 변수 파일 만들기 (1 min)
 
-<EC2_ASSIGEND_ADMIN_ROLE_NAME> 부분은 여러분이 EC2 생성할 때 사용한 이름과 동일한 것으로 대체합니다.
-
-파일 이름 : local.tfvars
+`~/eks-hands-on/terraform/eks/local.tfvars` 경로의 내용을 이전에 생성한 Role Name 으로 변경합니다. <br>
 ```
-aws_krug_admin_role = "<EC2_ASSIGEND_ADMIN_ROLE_NAME>"
+$ cd ~/eks-hands-on/terraform/eks
+$ vim local.tfvars
 ```
 
-### 2-3. Terraform Plan 보기
+**파일 내용**<br>
+``` 
+ec2_amdin_role = "wonder-mz-admin"
+```
+
+### 2-3. Terraform Plan 보기 (1 min)
 ```
 $ tf plan -var-file local.tfvars
 ~~~
@@ -151,7 +148,7 @@ can't guarantee that exactly these actions will be performed if
 "terraform apply" is subsequently run.
 ```
 
-### 2-4. Terraform 으로 EKS 생성하기
+### 2-4. Terraform 으로 EKS 생성하기 (15 mins)
 작성된 Terraform 은 아래 리소스를 생성합니다.
 * VPC (NatGateway 포함)
 * kubectl 명령을 수행할 서버
@@ -165,7 +162,7 @@ can't guarantee that exactly these actions will be performed if
 $ tf apply -var-file local.tfvars
 ```
 
-### 2-5. Ansible 로 kubectl 설정하기
+### 2-5. Ansible 로 kubectl 설정하기 (3 mins)
 
 ```
 ## Directory 이동
@@ -177,12 +174,10 @@ $ chmod 755 ansible_helper.sh
 $ ./ansible_helper.sh
 ```
 
-### 2-6. kubectl 서버에 접속하기.
-EC2 Console 에 보면 'awskrug_gudi-kubectl' 라는 이름의 EC2 가 생성된걸 볼 수 있습니다.
+### 2-6. kubectl 서버에 접속하기. (1 min)
+EC2 Console 에 보면 'wonder_mz_kubectl' 라는 이름의 EC2 가 생성된걸 볼 수 있습니다.
 
-먼저, 이 EC2 의 방화벽에 규칙을 추가하여 여러분의 PC에서 22 port 접속이 가능하게 합니다.
-
-이 후 EC2 에 접속하여 아래와 같이 EKS 상태를 봅니다.
+EC2 에 접속하여 아래와 같이 EKS 상태를 봅니다.
 
 <YOUR_kubectl_EC2_IP> 는 여러분의 EC2 IP를 넣습니다.
 ```
@@ -196,7 +191,7 @@ ip-172-16-10-185.ap-northeast-2.compute.internal   Ready    <none>   5m41s   v1.
 ip-172-16-12-159.ap-northeast-2.compute.internal   Ready    <none>   5m41s   v1.14.6-eks-5047ed
 ```
 
-## 3. EKS 생성 과정 들여다보기
+## 3. EKS 생성 과정 들여다보기 (30 mins)
 이번 파트는 terraform 코드와 함께, EKS를 생성하는 과정에서 순수 Kubernetes와는 상관없이 AWS EKS에서 꼭 필요한 내용들을 다룹니다.
 
 ### 3-1. VPC Tags 설정하기
@@ -302,16 +297,16 @@ AWS VPC CNI Plugin 은 EKS의 Pod가 VPC ENI로부터 secondary IP를 할당받�
 EKS의 권한 관리는 AWS IAM Authenticator for AWS를 통해 IAM과 연결됩니다. <br>
 EKS를 최초 생성할 땐, 생성할 당신의 IAM User 혹은 IAM Role 만이 EKS Cluster 에 인증 및 권한 취득이 가능합니다. 
 
-이번 Workshop 에서는 Terraform 을 통해서 EKS 를 생성하였고, Terraform 을 수행한 서버는 IAM Role (aws-krug-admin) 을 사용하였습니다. <br>
-RBAC에 다른 IAM User 나 Role을 추가하기 전 까지는 aws-krug-admin Role 만이 EKS Master에 명령 수행이 가능합니다.
+이번 Workshop 에서는 Terraform 을 통해서 EKS 를 생성하였고, Terraform 을 수행한 서버는 IAM Role (wonder-mz-admin) 을 사용하였습니다. <br>
+RBAC에 다른 IAM User 나 Role을 추가하기 전 까지는 wonder-mz-admin Role 만이 EKS Master에 명령 수행이 가능합니다.
 
-이 Workshop에서는 Kubectl 명령을 수행할 서버에 aws-krug-admin Role 을 할당하여 진행합니다.
+이 Workshop에서는 Kubectl 명령을 수행할 서버에 wonder-mz-admin Role 을 할당하여 진행합니다.
 
 **Terraform 코드**<br>
 kubectl 명령을 수행할 EC2에 iam_instance_profile 을 EKS 생성한 서버와 같은것을 할당 함.
 ```
 resource "aws_instance" "kubectl" {
-  iam_instance_profile = var.aws_krug_admin_role
+  iam_instance_profile = var.ec2_amdin_role
   associate_public_ip_address = true
   ami = var.kubectl_image_id
   subnet_id = var.vpc_public_subnet_ids[0]

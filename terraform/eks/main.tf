@@ -31,7 +31,7 @@ module "eks" {
   project_name = local.project_name
   kubectl_ec2_keypair = var.kubectl_ec2_keypair
   eks_version = var.eks_version
-  aws_krug_admin_role = var.aws_krug_admin_role
+  ec2_kubectl_role = var.ec2_admin_role
 
 }
 
