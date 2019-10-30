@@ -382,7 +382,26 @@ https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#AvailableIpPe
 <br>
 https://github.com/awslabs/amazon-eks-ami/blob/master/files/eni-max-pods.txt
 
-### 3-11. EKS Cluster 업데이트 하기
+
+### 3-11. Security Group Limit 체크하기
+AWS Security Group 기본 Limit은 ENI 1개당 최대 5개의 Security Group 할당이 가능한 방식입니다.<br>
+ENI 한개 당 최대 16개 Security Group 을 할당할 수 있도록 Limit 증가 요청은 가능합니다.
+
+주의할 점은, 할당 개수의 Limit이 변경되면, Security Group 마다 최대 등록 가능한 Rules 개수도 변경됩니다.<br>
+ENI에 할당된 모든 Security Groups의 Rules 를 다 합한 값은 1000을 넘을 수 없도록 되어있습니다.
+
+예를 들어, 할당 가능 개수를 5개에서 10개로 증가 시, Security Group 당 등록 가능한 Rules 개수는 200개에서 100개로 줄어듭니다.
+
+EKS 를 쓰면서 Security Group 개수가 문제되는 경우는 아래와 같습니다.<br>
+다수의 Namespace 를 생성해서 쓰는데, ALB Ingress controller 처럼, Namespace가 다른 경우 Security Group 을 추가로 할당하는 케이스.<br>
+서로 다른 namespace에 있는 ALB 는 최대 5개 까지밖에 생성되지 않는 문제.
+
+관련 문서
+<br>
+https://docs.aws.amazon.com/en_pv/vpc/latest/userguide/amazon-vpc-limits#vpc-limits-security-groups
+
+
+### 3-12. EKS Cluster 업데이트 하기
 EKS Master 는 관리형 서비스로 중단없이 seamless 하게 업데이트가 가능합니다.<br>
 다만, EKS Master 만 업데이트를 지원할 뿐, Worker Nodes, kubectl cli, iam-authenticator 등은 직접 업데이트 해야합니다.<br>
 특히 상용 서비스의 경우, 무중단 업데이트를 하는 것은 고려할 사항이 상당히 많을 수 있습니다. <br>
